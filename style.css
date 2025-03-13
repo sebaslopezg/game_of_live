@@ -1,0 +1,20 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+/* .screen{
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap
+} */
+.pixel{
+    display: inline-table;
+}
+.pixel:hover{
+   opacity: .5;
+}
+
+.start{
+    position: absolute;
+}
