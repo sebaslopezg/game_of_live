@@ -43,8 +43,9 @@ function createScreen(numberOfPixels,sizeOfPixels,color){
     document.body.appendChild(screen);
 }
 
+//Crear divs row y dentro de los mismos crear los pixels
 function fillScreen(sizeOfPixels, color) {
-    const screenWidth = window.innerWidth;
+    const screenWidth = window.innerWidth //window.innerWidth;
     const screenHeight = window.innerHeight;
     const cols = Math.ceil(screenWidth / sizeOfPixels);
     const rows = Math.ceil(screenHeight / sizeOfPixels);
@@ -54,9 +55,10 @@ function fillScreen(sizeOfPixels, color) {
     screen.setAttribute('class','screen')
 
     for (let i = 0; i < rows; i++) {
-        const br = document.createElement("br"); 
-        //screen.appendChild(br)     
-        for (let j = 0; j < cols; j++) {
+        const row = document.createElement("div");
+        row.setAttribute('class','row')
+        row.setAttribute('id',i)     
+        for (let j = 0; j < cols-2; j++) {
             const pixel = document.createElement("div");
     
             pixel.style.height = sizeOfPixels+'px'
@@ -67,11 +69,11 @@ function fillScreen(sizeOfPixels, color) {
             pixel.setAttribute("class", "pixel")
             pixel.setAttribute("data-state", "false")
             pixel.setAttribute("data-row", i)
-            screen.appendChild(pixel)
+            row.appendChild(pixel)
             
         }
+        screen.appendChild(row)
     }
-
     document.body.appendChild(screen);
     //createScreen(totalPixels, sizeOfPixels, color);
 }

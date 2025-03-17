@@ -18,3 +18,7 @@
 .start{
     position: absolute;
 }
+
+.row{
+    display: block;
+}
