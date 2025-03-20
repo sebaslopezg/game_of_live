@@ -5,6 +5,10 @@ const trueColor = '#000'
 const pixelSize = 20
 fillScreen(pixelSize, falseColor)
 
+addEventListener("resize", (e) => {
+    fillScreen(pixelSize, falseColor)
+})
+
 startButton.addEventListener('click', ()=> {
     executeRules()
 })
@@ -23,41 +27,32 @@ document.addEventListener('click', (e) => {
     }
 })
 
-function createScreen(numberOfPixels,sizeOfPixels,color){
-    const screen = document.createElement("div");
-    screen.setAttribute('class','screen')
-
-    for (let i = 0; i < numberOfPixels; i++) {
-        const pixel = document.createElement("div");
-
-        pixel.style.height = sizeOfPixels+'px'
-        pixel.style.width = sizeOfPixels+'px'
-        pixel.style.backgroundColor = color
-
-        pixel.setAttribute("id", i)
-        pixel.setAttribute("class", "pixel")
-        pixel.setAttribute("data-state", "false")
-        screen.appendChild(pixel)
-        
-    }
-    document.body.appendChild(screen);
-}
-
 //Crear divs row y dentro de los mismos crear los pixels
 function fillScreen(sizeOfPixels, color) {
     const screenWidth = window.innerWidth //window.innerWidth;
-    const screenHeight = window.innerHeight;
-    const cols = Math.ceil(screenWidth / sizeOfPixels);
-    const rows = Math.ceil(screenHeight / sizeOfPixels);
-    const totalPixels = cols * rows;
+    const screenHeight = window.innerHeight
+    const cols = Math.ceil(screenWidth / sizeOfPixels)
+    const rows = Math.ceil(screenHeight / sizeOfPixels)
 
-    const screen = document.createElement("div");
-    screen.setAttribute('class','screen')
+    let screenExist = document.getElementById("screen")
+    let screenElement
 
+    if (screenExist) {
+        screenElement = screenExist
+    }else{
+        screenElement = document.createElement('div')
+        screenElement.setAttribute('class','screen')
+        screenElement.setAttribute('id','screen')
+    }
+
+    const screen = screenElement
+    screen.innerHTML = ''
+
+    let pixelIdCounter = 0;
     for (let i = 0; i < rows; i++) {
         const row = document.createElement("div");
         row.setAttribute('class','row')
-        row.setAttribute('id',i)     
+        row.setAttribute('id',i)    
         for (let j = 0; j < cols-2; j++) {
             const pixel = document.createElement("div");
     
@@ -65,12 +60,13 @@ function fillScreen(sizeOfPixels, color) {
             pixel.style.width = sizeOfPixels+'px'
             pixel.style.backgroundColor = color
     
-            pixel.setAttribute("id", j)
+            pixel.setAttribute("data-row-id", j)
+            pixel.setAttribute("id", pixelIdCounter)
             pixel.setAttribute("class", "pixel")
             pixel.setAttribute("data-state", "false")
             pixel.setAttribute("data-row", i)
             row.appendChild(pixel)
-            
+            pixelIdCounter++
         }
         screen.appendChild(row)
     }
@@ -83,14 +79,17 @@ function executeRules(){
     cuadros.forEach(cuadro =>{
         //console.log(cuadro.dataset.state)
         if (cuadro.dataset.state == 'true') {
-            console.log(cuadro.id)
-            getBottom(cuadro.id)
+            getTop(cuadro.id)
         }
     })
 }
 
 function getTop(id){
-
+    const cuadro = document.getElementById(id)
+    console.log(cuadro)
+    let row = cuadro.dataset.row - 1
+    let pixel = cuadro.dataset.rowId
+    getPixel(row, pixel)
 }
 function getBottom(id){
     const screenWidth = window.innerWidth;
@@ -127,6 +126,15 @@ function getCornerBottomRight(id){
 function getCornerBottomLeft(id){
 }
 
+function getPixel(row, pixel){
+    let cuadros = document.querySelectorAll('.pixel')
+    cuadros.forEach(pixel =>{
+        if (pixel) {
+            
+        }
+    })
+}
+
 let secondsPassed;
 let oldTimeStamp;
 let fps;
@@ -148,3 +156,26 @@ function gameLoop(timeStamp) {
     // The loop function has reached it's end. Keep requesting new frames
     window.requestAnimationFrame(gameLoop);
 }
+
+
+////// funciones que no se usan
+
+/* function createScreen(numberOfPixels,sizeOfPixels,color){
+    const screen = document.createElement("div");
+    screen.setAttribute('class','screen')
+
+    for (let i = 0; i < numberOfPixels; i++) {
+        const pixel = document.createElement("div");
+
+        pixel.style.height = sizeOfPixels+'px'
+        pixel.style.width = sizeOfPixels+'px'
+        pixel.style.backgroundColor = color
+
+        pixel.setAttribute("id", i)
+        pixel.setAttribute("class", "pixel")
+        pixel.setAttribute("data-state", "false")
+        screen.appendChild(pixel)
+        
+    }
+    document.body.appendChild(screen);
+} */
