@@ -1,4 +1,4 @@
-//createScreen(1000,20,"#d8d8d8")
+
 const startButton = document.querySelector('#start')
 const falseColor = '#d8d8d8'
 const trueColor = '#000'
@@ -77,60 +77,84 @@ function fillScreen(sizeOfPixels, color) {
 function executeRules(){
     let cuadros = document.querySelectorAll('.pixel')
     cuadros.forEach(cuadro =>{
-        //console.log(cuadro.dataset.state)
         if (cuadro.dataset.state == 'true') {
             getTop(cuadro.id)
+            getLeft(cuadro.id)
+            getRight(cuadro.id)
+            getBottom(cuadro.id)
+            getCornerTopRight(cuadro.id)
+            getCornerTopLeft(cuadro.id)
+            getCornerBottomRight(cuadro.id)
+            getCornerBottomLeft(cuadro.id)
         }
     })
 }
 
 function getTop(id){
     const cuadro = document.getElementById(id)
-    console.log(cuadro)
     let row = cuadro.dataset.row - 1
     let pixel = cuadro.dataset.rowId
     getPixel(row, pixel)
 }
 function getBottom(id){
-    const screenWidth = window.innerWidth;
-    const screenHeight = window.innerHeight;
-    const cols = Math.ceil(screenWidth / pixelSize);
-    const rows = Math.ceil(screenHeight / pixelSize);
-    //let pixelBottomId = parseInt(id) - 1 // getLeft
-    //let pixelBottomId = parseInt(id) + 1 // getRight
-    let pixelBottomId = parseInt(id)  // getTop
-    let pixelBottom = document.getElementById(pixelBottomId)
-    pixelBottom.style.backgroundColor = "red"
-    console.log('id:' + id)
-    console.log('Cols:' + cols)
-    console.log('rows' + rows)
-    console.log('Pixel bottom id:' + pixelBottomId)
-    console.log(pixelBottom)
+    const cuadro = document.getElementById(id)
+    let row = parseInt(cuadro.dataset.row) + 1
+    let pixel = cuadro.dataset.rowId
+    getPixel(row, pixel)
 }
 
 function getLeft(id){
+    const cuadro = document.getElementById(id)
+    let row = cuadro.dataset.row
+    let pixel = cuadro.dataset.rowId - 1
+    getPixel(row, pixel)
 }
 
 function getRight(id){
+    const cuadro = document.getElementById(id)
+    let row = cuadro.dataset.row
+    let pixel = parseInt(cuadro.dataset.rowId) + 1
+    getPixel(row, pixel)
 }
 
 function getCornerTopRight(id){
+    const cuadro = document.getElementById(id)
+    let row = parseInt(cuadro.dataset.row) - 1
+    let pixel = parseInt(cuadro.dataset.rowId) + 1
+    getPixel(row, pixel)
 }
 
 function getCornerTopLeft(id){
+    const cuadro = document.getElementById(id)
+    let row = parseInt(cuadro.dataset.row) - 1
+    let pixel = parseInt(cuadro.dataset.rowId) - 1
+    getPixel(row, pixel)
 }
 
 function getCornerBottomRight(id){
+    const cuadro = document.getElementById(id)
+    let row = parseInt(cuadro.dataset.row) + 1
+    let pixel = parseInt(cuadro.dataset.rowId) + 1
+    getPixel(row, pixel)
 }
 
 function getCornerBottomLeft(id){
+    const cuadro = document.getElementById(id)
+    let row = parseInt(cuadro.dataset.row) + 1
+    let pixel = parseInt(cuadro.dataset.rowId) - 1
+    getPixel(row, pixel)
 }
 
 function getPixel(row, pixel){
+    let idPixel = pixel
     let cuadros = document.querySelectorAll('.pixel')
     cuadros.forEach(pixel =>{
         if (pixel) {
-            
+            let matchRow = pixel.dataset.row == row
+            let matchPixel = pixel.dataset.rowId == idPixel
+            if (matchRow && matchPixel) {
+                pixel.style.backgroundColor = 'red'
+            }
         }
     })
 }
@@ -139,7 +163,8 @@ let secondsPassed;
 let oldTimeStamp;
 let fps;
 
-gameLoop()
+//activa el loop infinito del juego
+//gameLoop()
 
 function gameLoop(timeStamp) {
 
@@ -156,26 +181,3 @@ function gameLoop(timeStamp) {
     // The loop function has reached it's end. Keep requesting new frames
     window.requestAnimationFrame(gameLoop);
 }
-
-
-////// funciones que no se usan
-
-/* function createScreen(numberOfPixels,sizeOfPixels,color){
-    const screen = document.createElement("div");
-    screen.setAttribute('class','screen')
-
-    for (let i = 0; i < numberOfPixels; i++) {
-        const pixel = document.createElement("div");
-
-        pixel.style.height = sizeOfPixels+'px'
-        pixel.style.width = sizeOfPixels+'px'
-        pixel.style.backgroundColor = color
-
-        pixel.setAttribute("id", i)
-        pixel.setAttribute("class", "pixel")
-        pixel.setAttribute("data-state", "false")
-        screen.appendChild(pixel)
-        
-    }
-    document.body.appendChild(screen);
-} */
