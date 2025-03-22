@@ -15,14 +15,23 @@
 } */
 .pixel{
     display: inline-table;
+    border:solid 1px #d8d8d8;
 }
 .pixel:hover{
-   opacity: .5;
+   border: solid 1px;
+}
+
+.panel{
+    top:8px;
+    left: 8px;
+    position: absolute;
+    z-index: 0;
+    background-color: #fff;
+    border-radius: 4px;
+    padding: 8px;
 }
 
 .start{
-    position: absolute;
-    z-index: 0;
     background-color: var(--primary-color);
     border: none;
     border-radius: 4px;

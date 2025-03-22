@@ -1,8 +1,23 @@
 
 const startButton = document.querySelector('#start')
+const nextButton = document.querySelector('#next')
+const stopButton = document.querySelector('#stop')
 const falseColor = '#d8d8d8'
 const trueColor = '#000'
 const pixelSize = 20
+let executionState = false
+
+let arroundCells = {
+    top:null,
+    bottom:null,
+    left:null,
+    right:null,
+    CornerTopRight:null,
+    CornerTopLeft:null,
+    CornerBottomRight:null,
+    CornerBottomLeft:null,
+}
+
 fillScreen(pixelSize, falseColor)
 
 addEventListener("resize", (e) => {
@@ -10,7 +25,13 @@ addEventListener("resize", (e) => {
 })
 
 startButton.addEventListener('click', ()=> {
+    startExecution()
+})
+nextButton.addEventListener('click', ()=> {
     executeRules()
+})
+stopButton.addEventListener('click', ()=> {
+    stopExecution()
 })
 
 document.addEventListener('click', (e) => {
@@ -22,7 +43,7 @@ document.addEventListener('click', (e) => {
             element.style.backgroundColor = falseColor  
         }else{
             element.setAttribute("data-state", "true")
-            element.style.backgroundColor = trueColor
+            element.style.backgroundColor = getRandomColor()
         }
     }
 })
@@ -53,7 +74,7 @@ function fillScreen(sizeOfPixels, color) {
         const row = document.createElement("div");
         row.setAttribute('class','row')
         row.setAttribute('id',i)    
-        for (let j = 0; j < cols-2; j++) {
+        for (let j = 0; j < cols-7; j++) {
             const pixel = document.createElement("div");
     
             pixel.style.height = sizeOfPixels+'px'
@@ -77,75 +98,153 @@ function fillScreen(sizeOfPixels, color) {
 function executeRules(){
     let cuadros = document.querySelectorAll('.pixel')
     cuadros.forEach(cuadro =>{
+        let count = 0
         if (cuadro.dataset.state == 'true') {
-            getTop(cuadro.id)
-            getLeft(cuadro.id)
-            getRight(cuadro.id)
-            getBottom(cuadro.id)
-            getCornerTopRight(cuadro.id)
-            getCornerTopLeft(cuadro.id)
-            getCornerBottomRight(cuadro.id)
-            getCornerBottomLeft(cuadro.id)
+            setNull(arroundCells)
+            count = countNeighborsPixels(cuadro.id)
+            if (count > 3) {
+                cuadro.setAttribute("data-state", "false")
+                cuadro.style.backgroundColor = falseColor
+            }else if(count < 2){
+                cuadro.setAttribute("data-state", "false")
+                cuadro.style.backgroundColor = falseColor
+            }
+
+            Object.entries(arroundCells).forEach(prop =>{
+                cellIsNull = prop[1] == null
+                cell = prop[1]
+                if (!cellIsNull) {
+                    count = countNeighborsPixels(cell.id)
+                    if (count == 3) {
+                        cell.setAttribute("data-state", "true")
+                        cell.style.backgroundColor = getRandomColor()
+                    }
+                }
+            })
         }
     })
 }
 
+function countNeighborsPixels(pixelId){
+    let count = 0
+
+    getTop(pixelId) == 'true' ? count++ : ''
+    getLeft(pixelId) == 'true' ? count++ : ''
+    getRight(pixelId) == 'true' ? count++ : ''
+    getBottom(pixelId) == 'true' ? count++ : ''
+    getCornerTopRight(pixelId) == 'true' ? count++ : ''
+    getCornerTopLeft(pixelId) == 'true' ? count++ : ''
+    getCornerBottomRight(pixelId) == 'true' ? count++ : ''
+    getCornerBottomLeft(pixelId) == 'true' ? count++ : ''
+
+    return count
+}
+
 function getTop(id){
+    let respuesta
     const cuadro = document.getElementById(id)
     let row = cuadro.dataset.row - 1
-    let pixel = cuadro.dataset.rowId
-    getPixel(row, pixel)
+    let cell = cuadro.dataset.rowId
+    let pixel = getPixel(row, cell)
+    arroundCells.top = pixel
+    if (pixel) {
+        respuesta = pixel.dataset.state
+    }
+    return respuesta
 }
 function getBottom(id){
+    let respuesta
     const cuadro = document.getElementById(id)
     let row = parseInt(cuadro.dataset.row) + 1
-    let pixel = cuadro.dataset.rowId
-    getPixel(row, pixel)
+    let cell = cuadro.dataset.rowId
+    let pixel = getPixel(row, cell)
+    arroundCells.bottom = pixel
+    if (pixel) {
+        respuesta = pixel.dataset.state
+    }
+    return respuesta
 }
 
 function getLeft(id){
+    let respuesta
     const cuadro = document.getElementById(id)
     let row = cuadro.dataset.row
-    let pixel = cuadro.dataset.rowId - 1
-    getPixel(row, pixel)
+    let cell = cuadro.dataset.rowId - 1
+    let pixel = getPixel(row, cell)
+    arroundCells.left = pixel
+    if (pixel) {
+        respuesta = pixel.dataset.state
+    }
+    return respuesta
 }
 
 function getRight(id){
+    let respuesta
     const cuadro = document.getElementById(id)
     let row = cuadro.dataset.row
-    let pixel = parseInt(cuadro.dataset.rowId) + 1
-    getPixel(row, pixel)
+    let cell = parseInt(cuadro.dataset.rowId) + 1
+    let pixel = getPixel(row, cell)
+    arroundCells.right = pixel
+    if (pixel) {
+        respuesta = pixel.dataset.state
+    }
+    return respuesta
 }
 
 function getCornerTopRight(id){
+    let respuesta
     const cuadro = document.getElementById(id)
     let row = parseInt(cuadro.dataset.row) - 1
-    let pixel = parseInt(cuadro.dataset.rowId) + 1
-    getPixel(row, pixel)
+    let cell = parseInt(cuadro.dataset.rowId) + 1
+    let pixel = getPixel(row, cell)
+    arroundCells.CornerTopRight = pixel
+    if (pixel) {
+        respuesta = pixel.dataset.state
+    }
+    return respuesta
 }
 
 function getCornerTopLeft(id){
+    let respuesta
     const cuadro = document.getElementById(id)
     let row = parseInt(cuadro.dataset.row) - 1
-    let pixel = parseInt(cuadro.dataset.rowId) - 1
-    getPixel(row, pixel)
+    let cell = parseInt(cuadro.dataset.rowId) - 1
+    let pixel = getPixel(row, cell)
+    arroundCells.CornerTopLeft = pixel
+    if (pixel) {
+        respuesta = pixel.dataset.state
+    }
+    return respuesta
 }
 
 function getCornerBottomRight(id){
+    let respuesta
     const cuadro = document.getElementById(id)
     let row = parseInt(cuadro.dataset.row) + 1
-    let pixel = parseInt(cuadro.dataset.rowId) + 1
-    getPixel(row, pixel)
+    let cell = parseInt(cuadro.dataset.rowId) + 1
+    let pixel = getPixel(row, cell)
+    arroundCells.CornerBottomRight = pixel
+    if (pixel) {
+        respuesta = pixel.dataset.state
+    }
+    return respuesta
 }
 
 function getCornerBottomLeft(id){
+    let respuesta
     const cuadro = document.getElementById(id)
     let row = parseInt(cuadro.dataset.row) + 1
-    let pixel = parseInt(cuadro.dataset.rowId) - 1
-    getPixel(row, pixel)
+    let cell = parseInt(cuadro.dataset.rowId) - 1
+    let pixel = getPixel(row, cell)
+    arroundCells.CornerTopLeft = pixel
+    if (pixel) {
+        respuesta = pixel.dataset.state
+    }
+    return respuesta
 }
 
 function getPixel(row, pixel){
+    let respuesta
     let idPixel = pixel
     let cuadros = document.querySelectorAll('.pixel')
     cuadros.forEach(pixel =>{
@@ -153,18 +252,42 @@ function getPixel(row, pixel){
             let matchRow = pixel.dataset.row == row
             let matchPixel = pixel.dataset.rowId == idPixel
             if (matchRow && matchPixel) {
-                pixel.style.backgroundColor = 'red'
+                //pixel.style.backgroundColor = 'red'
+                respuesta = pixel
             }
         }
     })
+    return respuesta
 }
+
+function setNull(obj){
+    Object.entries(obj).forEach((key) =>{
+        obj[key[0]] = null
+    })
+}
+
+function getRandomColor() {
+    var letters = '0123456789ABCDEF';
+    var color = '#';
+    for (var i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  }
 
 let secondsPassed;
 let oldTimeStamp;
 let fps;
 
 //activa el loop infinito del juego
-//gameLoop()
+function startExecution(){
+    executionState = true
+    gameLoop()
+}
+
+function stopExecution(){
+    executionState = false
+}
 
 function gameLoop(timeStamp) {
 
@@ -174,10 +297,13 @@ function gameLoop(timeStamp) {
 
     // Calculate fps
     fps = Math.round(1 / secondsPassed);
+    executeRules()
 
     // Draw number to the screen
     //console.log('FPS:' + fps)
 
     // The loop function has reached it's end. Keep requesting new frames
-    window.requestAnimationFrame(gameLoop);
+    if (executionState) {
+        window.requestAnimationFrame(gameLoop);
+    }
 }
