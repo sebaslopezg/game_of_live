@@ -2,10 +2,14 @@
 const startButton = document.querySelector('#start')
 const nextButton = document.querySelector('#next')
 const stopButton = document.querySelector('#stop')
-const falseColor = '#d8d8d8'
-const trueColor = '#000'
-const pixelSize = 20
+const fpsCounter = document.querySelector('#fpsCounter')
+let secondsPassed;
+let oldTimeStamp;
+let fps;
+
 let executionState = false
+let nextAliveCells = []
+let nextDiedCells = []
 
 let arroundCells = {
     top:null,
@@ -18,20 +22,16 @@ let arroundCells = {
     CornerBottomLeft:null,
 }
 
-fillScreen(pixelSize, falseColor)
-
-addEventListener("resize", (e) => {
-    fillScreen(pixelSize, falseColor)
-})
-
 startButton.addEventListener('click', ()=> {
     startExecution()
 })
 nextButton.addEventListener('click', ()=> {
     executeRules()
+    setCells()
 })
 stopButton.addEventListener('click', ()=> {
     stopExecution()
+    fpsCounter.innerHTML = 0
 })
 
 document.addEventListener('click', (e) => {
@@ -43,59 +43,18 @@ document.addEventListener('click', (e) => {
             element.style.backgroundColor = falseColor  
         }else{
             element.setAttribute("data-state", "true")
-            element.style.backgroundColor = getRandomColor()
+            let cellColor
+            isRandomColor ? cellColor = getRandomColor() : cellColor = trueColor
+            element.style.backgroundColor = cellColor
         }
     }
 })
 
-//Crear divs row y dentro de los mismos crear los pixels
-function fillScreen(sizeOfPixels, color) {
-    const screenWidth = window.innerWidth //window.innerWidth;
-    const screenHeight = window.innerHeight
-    const cols = Math.ceil(screenWidth / sizeOfPixels)
-    const rows = Math.ceil(screenHeight / sizeOfPixels)
-
-    let screenExist = document.getElementById("screen")
-    let screenElement
-
-    if (screenExist) {
-        screenElement = screenExist
-    }else{
-        screenElement = document.createElement('div')
-        screenElement.setAttribute('class','screen')
-        screenElement.setAttribute('id','screen')
-    }
-
-    const screen = screenElement
-    screen.innerHTML = ''
-
-    let pixelIdCounter = 0;
-    for (let i = 0; i < rows; i++) {
-        const row = document.createElement("div");
-        row.setAttribute('class','row')
-        row.setAttribute('id',i)    
-        for (let j = 0; j < cols-7; j++) {
-            const pixel = document.createElement("div");
-    
-            pixel.style.height = sizeOfPixels+'px'
-            pixel.style.width = sizeOfPixels+'px'
-            pixel.style.backgroundColor = color
-    
-            pixel.setAttribute("data-row-id", j)
-            pixel.setAttribute("id", pixelIdCounter)
-            pixel.setAttribute("class", "pixel")
-            pixel.setAttribute("data-state", "false")
-            pixel.setAttribute("data-row", i)
-            row.appendChild(pixel)
-            pixelIdCounter++
-        }
-        screen.appendChild(row)
-    }
-    document.body.appendChild(screen);
-    //createScreen(totalPixels, sizeOfPixels, color);
-}
-
 function executeRules(){
+
+    nextAliveCells = []
+    nextDiedCells = []
+
     let cuadros = document.querySelectorAll('.pixel')
     cuadros.forEach(cuadro =>{
         let count = 0
@@ -103,11 +62,13 @@ function executeRules(){
             setNull(arroundCells)
             count = countNeighborsPixels(cuadro.id)
             if (count > 3) {
-                cuadro.setAttribute("data-state", "false")
-                cuadro.style.backgroundColor = falseColor
+                //cuadro.setAttribute("data-state", "false")
+                //cuadro.style.backgroundColor = falseColor
+                nextDiedCells.push(cuadro.id)
             }else if(count < 2){
-                cuadro.setAttribute("data-state", "false")
-                cuadro.style.backgroundColor = falseColor
+                //cuadro.setAttribute("data-state", "false")
+                //cuadro.style.backgroundColor = falseColor
+                nextDiedCells.push(cuadro.id)
             }
 
             Object.entries(arroundCells).forEach(prop =>{
@@ -116,8 +77,11 @@ function executeRules(){
                 if (!cellIsNull) {
                     count = countNeighborsPixels(cell.id)
                     if (count == 3) {
-                        cell.setAttribute("data-state", "true")
-                        cell.style.backgroundColor = getRandomColor()
+                        //cell.setAttribute("data-state", "true")
+                        //let cellColor
+                        //isRandomColor ? cellColor = getRandomColor() : cellColor = trueColor
+                        //cell.style.backgroundColor = cellColor
+                        nextAliveCells.push(cell.id)
                     }
                 }
             })
@@ -266,18 +230,22 @@ function setNull(obj){
     })
 }
 
-function getRandomColor() {
-    var letters = '0123456789ABCDEF';
-    var color = '#';
-    for (var i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-  }
+function setCells(){
 
-let secondsPassed;
-let oldTimeStamp;
-let fps;
+    nextAliveCells.forEach(cellId =>{
+        const cell = document.getElementById(cellId)
+        cell.setAttribute("data-state", "true")
+        let cellColor
+        isRandomColor ? cellColor = getRandomColor() : cellColor = trueColor
+        cell.style.backgroundColor = cellColor
+    })
+
+    nextDiedCells.forEach(cellId => {
+        const cell = document.getElementById(cellId)
+        cell.setAttribute("data-state", "false")
+        cell.style.backgroundColor = falseColor
+    })
+}
 
 //activa el loop infinito del juego
 function startExecution(){
@@ -297,7 +265,9 @@ function gameLoop(timeStamp) {
 
     // Calculate fps
     fps = Math.round(1 / secondsPassed);
+    fpsCounter.innerHTML = fps
     executeRules()
+    setCells()
 
     // Draw number to the screen
     //console.log('FPS:' + fps)
