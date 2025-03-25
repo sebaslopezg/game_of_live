@@ -10,6 +10,7 @@ let fps;
 let executionState = false
 let nextAliveCells = []
 let nextDiedCells = []
+let activePixels = []
 
 let arroundCells = {
     top:null,
@@ -39,10 +40,16 @@ document.addEventListener('click', (e) => {
     if (isPixel) {
         const element = e.target
         if (element.dataset.state == 'true') {
+            //activePixels.push(element.id)
+            let arrIndex = activePixels.indexOf(element.id)
+            if (arrIndex > -1) {
+                activePixels.splice(arrIndex, 1);
+            }
             element.setAttribute("data-state", "false")
-            element.style.backgroundColor = falseColor  
+            element.style.backgroundColor = falseColor
         }else{
             element.setAttribute("data-state", "true")
+            activePixels.push(element.id)
             let cellColor
             isRandomColor ? cellColor = getRandomColor() : cellColor = trueColor
             element.style.backgroundColor = cellColor
@@ -54,20 +61,20 @@ function executeRules(){
 
     nextAliveCells = []
     nextDiedCells = []
-
-    let cuadros = document.querySelectorAll('.pixel')
+    let cuadros = []
+    activePixels.forEach(pixel => {
+        let element = document.getElementById(pixel)
+        cuadros.push(element)
+    })
+    //let cuadros = document.querySelectorAll('.pixel')
     cuadros.forEach(cuadro =>{
         let count = 0
         if (cuadro.dataset.state == 'true') {
             setNull(arroundCells)
             count = countNeighborsPixels(cuadro.id)
             if (count > 3) {
-                //cuadro.setAttribute("data-state", "false")
-                //cuadro.style.backgroundColor = falseColor
                 nextDiedCells.push(cuadro.id)
             }else if(count < 2){
-                //cuadro.setAttribute("data-state", "false")
-                //cuadro.style.backgroundColor = falseColor
                 nextDiedCells.push(cuadro.id)
             }
 
@@ -234,7 +241,9 @@ function setCells(){
 
     nextAliveCells.forEach(cellId =>{
         const cell = document.getElementById(cellId)
+
         cell.setAttribute("data-state", "true")
+        activePixels.push(cellId)
         let cellColor
         isRandomColor ? cellColor = getRandomColor() : cellColor = trueColor
         cell.style.backgroundColor = cellColor
@@ -242,6 +251,8 @@ function setCells(){
 
     nextDiedCells.forEach(cellId => {
         const cell = document.getElementById(cellId)
+        let indexSlice = activePixels.indexOf(cellId)
+        activePixels.slice(indexSlice)
         cell.setAttribute("data-state", "false")
         cell.style.backgroundColor = falseColor
     })
@@ -277,3 +288,20 @@ function gameLoop(timeStamp) {
         window.requestAnimationFrame(gameLoop);
     }
 }
+
+
+/**
+ * 
+
+
+                <div class="card" style="width: 18rem;" key={post.id}>
+                <div class="card-body">
+                    <h5 class="card-title">{post.first_name}</h5>
+                    <h6 class="card-subtitle mb-2 text-body-secondary">id: {post.id}</h6>
+                    <p class="card-text">{post.email}</p>
+                    <img src={post.avatar} alt="" />
+                </div>
+                </div>
+
+
+ */

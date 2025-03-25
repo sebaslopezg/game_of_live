@@ -28,7 +28,7 @@ function fillScreen(sizeOfPixels, color) {
         const row = document.createElement("div");
         row.setAttribute('class','row')
         row.setAttribute('id',i)    
-        for (let j = 0; j < cols-7; j++) {
+        for (let j = 0; j < cols-10; j++) {
             const pixel = document.createElement("div");
     
             pixel.style.height = sizeOfPixels+'px'
