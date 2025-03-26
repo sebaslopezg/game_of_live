@@ -29,6 +29,7 @@ startButton.addEventListener('click', ()=> {
 nextButton.addEventListener('click', ()=> {
     executeRules()
     setCells()
+    console.log(activePixels)
 })
 stopButton.addEventListener('click', ()=> {
     stopExecution()
@@ -59,18 +60,21 @@ document.addEventListener('click', (e) => {
 
 function executeRules(){
 
-    nextAliveCells = []
-    nextDiedCells = []
     let cuadros = []
+
+    activePixels = [...new Set(activePixels)];
+
     activePixels.forEach(pixel => {
         let element = document.getElementById(pixel)
         cuadros.push(element)
     })
+
     //let cuadros = document.querySelectorAll('.pixel')
     cuadros.forEach(cuadro =>{
         let count = 0
         if (cuadro.dataset.state == 'true') {
             setNull(arroundCells)
+            //console.log(arroundCells)
             count = countNeighborsPixels(cuadro.id)
             if (count > 3) {
                 nextDiedCells.push(cuadro.id)
@@ -84,10 +88,6 @@ function executeRules(){
                 if (!cellIsNull) {
                     count = countNeighborsPixels(cell.id)
                     if (count == 3) {
-                        //cell.setAttribute("data-state", "true")
-                        //let cellColor
-                        //isRandomColor ? cellColor = getRandomColor() : cellColor = trueColor
-                        //cell.style.backgroundColor = cellColor
                         nextAliveCells.push(cell.id)
                     }
                 }
@@ -217,7 +217,8 @@ function getCornerBottomLeft(id){
 function getPixel(row, pixel){
     let respuesta
     let idPixel = pixel
-    let cuadros = document.querySelectorAll('.pixel')
+    //let cuadros = document.querySelectorAll('.pixel')
+    let cuadros = document.querySelectorAll(`[data-row="${row}"]`)
     cuadros.forEach(pixel =>{
         if (pixel) {
             let matchRow = pixel.dataset.row == row
@@ -251,11 +252,24 @@ function setCells(){
 
     nextDiedCells.forEach(cellId => {
         const cell = document.getElementById(cellId)
-        let indexSlice = activePixels.indexOf(cellId)
-        activePixels.slice(indexSlice)
+        let indexSlice = activePixels.indexOf(cell.id)
+        //console.log(indexSlice)
+        if (indexSlice > -1) {
+            activePixels.splice(indexSlice,1)
+        }
+        
+        //console.log(activePixels)
         cell.setAttribute("data-state", "false")
         cell.style.backgroundColor = falseColor
     })
+
+    while (nextAliveCells.length > 0) {
+        nextAliveCells.pop();
+    }
+
+    while (nextDiedCells.length > 0) {
+        nextDiedCells.pop();
+    }
 }
 
 //activa el loop infinito del juego
@@ -270,38 +284,15 @@ function stopExecution(){
 
 function gameLoop(timeStamp) {
 
-    // Calculate the number of seconds passed since the last frame
     secondsPassed = (timeStamp - oldTimeStamp) / 1000;
     oldTimeStamp = timeStamp;
 
-    // Calculate fps
     fps = Math.round(1 / secondsPassed);
     fpsCounter.innerHTML = fps
     executeRules()
     setCells()
 
-    // Draw number to the screen
-    //console.log('FPS:' + fps)
-
-    // The loop function has reached it's end. Keep requesting new frames
     if (executionState) {
         window.requestAnimationFrame(gameLoop);
     }
 }
-
-
-/**
- * 
-
-
-                <div class="card" style="width: 18rem;" key={post.id}>
-                <div class="card-body">
-                    <h5 class="card-title">{post.first_name}</h5>
-                    <h6 class="card-subtitle mb-2 text-body-secondary">id: {post.id}</h6>
-                    <p class="card-text">{post.email}</p>
-                    <img src={post.avatar} alt="" />
-                </div>
-                </div>
-
-
- */
