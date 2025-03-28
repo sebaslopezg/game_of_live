@@ -3,10 +3,16 @@ const startButton = document.querySelector('#start')
 const nextButton = document.querySelector('#next')
 const stopButton = document.querySelector('#stop')
 const fpsCounter = document.querySelector('#fpsCounter')
+const populationCounter = document.querySelector('#populationCounter')
+const generationCounter = document.querySelector('#generationCounter')
+
 let secondsPassed;
 let oldTimeStamp;
 let fps;
+let population
+let generaciones = 0
 
+let startButtonState = false
 let executionState = false
 let nextAliveCells = []
 let nextDiedCells = []
@@ -24,16 +30,18 @@ let arroundCells = {
 }
 
 startButton.addEventListener('click', ()=> {
+    startButtonState ? '' : ''
     startExecution()
 })
 nextButton.addEventListener('click', ()=> {
     executeRules()
     setCells()
-    console.log(activePixels)
 })
 stopButton.addEventListener('click', ()=> {
     stopExecution()
     fpsCounter.innerHTML = 0
+    fps = 0
+    //generaciones = 0
 })
 
 document.addEventListener('click', (e) => {
@@ -48,12 +56,14 @@ document.addEventListener('click', (e) => {
             }
             element.setAttribute("data-state", "false")
             element.style.backgroundColor = falseColor
+            population = activePixels.length
         }else{
             element.setAttribute("data-state", "true")
             activePixels.push(element.id)
             let cellColor
             isRandomColor ? cellColor = getRandomColor() : cellColor = trueColor
             element.style.backgroundColor = cellColor
+            population = activePixels.length
         }
     }
 })
@@ -248,6 +258,7 @@ function setCells(){
         let cellColor
         isRandomColor ? cellColor = getRandomColor() : cellColor = trueColor
         cell.style.backgroundColor = cellColor
+        population = activePixels.length
     })
 
     nextDiedCells.forEach(cellId => {
@@ -261,6 +272,7 @@ function setCells(){
         //console.log(activePixels)
         cell.setAttribute("data-state", "false")
         cell.style.backgroundColor = falseColor
+        population = activePixels.length
     })
 
     while (nextAliveCells.length > 0) {
@@ -286,9 +298,12 @@ function gameLoop(timeStamp) {
 
     secondsPassed = (timeStamp - oldTimeStamp) / 1000;
     oldTimeStamp = timeStamp;
+    generaciones++
 
     fps = Math.round(1 / secondsPassed);
     fpsCounter.innerHTML = fps
+    populationCounter.innerHTML = population
+    generationCounter.innerHTML = generaciones
     executeRules()
     setCells()
 
